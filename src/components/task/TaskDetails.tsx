@@ -1,13 +1,13 @@
 'use client';
 
-import { Button, IconButton, Stack, Typography } from '@mui/material';
+import { Button, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useTaskDatabase } from '../providers/TaskDatabaseProvider';
 import { Controller, useForm } from 'react-hook-form';
 import DatePickerChip from '../ui/DatePickerChip';
 import TaskStatusPickerChip from '../ui/TaskStatusPickerChip';
 import { Task } from '@/models/Task';
 import { useRouter } from 'next/navigation';
-import { OpenInNew } from '@mui/icons-material';
+import { Delete, OpenInNew } from '@mui/icons-material';
 
 type TaskDetailsProps = {
   id: string;
@@ -89,18 +89,16 @@ export default function TaskDetails({ id, isMini }: TaskDetailsProps) {
             }}
           />
         </div>
-        <Button
-          variant="outlined"
-          sx={{
-            color: '#93000A',
-          }}
-          onClick={async () => {
-            await deleteTask(task);
-            router.back();
-          }}
-        >
-          Delete task
-        </Button>
+        <Tooltip title="Delete">
+          <IconButton
+            onClick={async () => {
+              await deleteTask(task);
+              router.back();
+            }}
+          >
+            <Delete />
+          </IconButton>
+        </Tooltip>
       </div>
     </Stack>
   );
