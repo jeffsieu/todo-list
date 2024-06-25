@@ -1,38 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { TaskDatabase } from './TaskDatabase';
 import { Task, TaskDraft, taskSchema } from '@/models/Task';
 import useLocalStorage from './useLocalStorage';
 import z from 'zod';
 import superjson from 'superjson';
 
-const LOCAL_DATABASE_NAME = 'my-task-list';
-const LOCAL_DATABASE_VERSION = 1;
-
-const initialTasks: Task[] = [
-  {
-    id: 'TOD-1',
-    title: 'Make Task List',
-    dueDate: new Date('2024-06-24'),
-    description:
-      'Make a task list app with React and TypeScript. Super duper duper duper long description',
-    status: 'in-progress',
-  },
-  {
-    id: 'TOD-2',
-    title: 'hello',
-    dueDate: null,
-    description: 'my task',
-    status: 'completed',
-  },
-  {
-    id: 'TOD-3',
-    title: 'Make Task List',
-    dueDate: new Date('2024-06-24'),
-    description:
-      'Make a task list app with React and TypeScript. Super duper duper duper long description',
-    status: 'in-progress',
-  },
-];
+const LOCAL_STORAGE_KEY = 'my-task-list';
 
 function generatePseudoRandomId() {
   const S4 = function () {
@@ -61,22 +34,21 @@ function isTaskDraft(task: Task | TaskDraft): task is TaskDraft {
 const tasksSchema = z.array(taskSchema);
 
 export function useLocalTaskDatabase(): TaskDatabase {
-  const [tasksRaw, setTasksRaw] = useLocalStorage(LOCAL_DATABASE_NAME);
+  const [tasksRaw, setTasksRaw] = useLocalStorage(LOCAL_STORAGE_KEY);
 
   const tasks = useMemo(() => {
     if (!tasksRaw) {
-      return initialTasks;
+      return [];
     }
 
     try {
       const parsedTasks = superjson.parse(tasksRaw);
-      console.log(parsedTasks);
       const tasks = tasksSchema.parse(parsedTasks);
 
       return tasks;
     } catch (e) {
-      console.log(e);
-      return initialTasks;
+      console.error(e);
+      return [];
     }
   }, [tasksRaw]);
 

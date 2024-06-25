@@ -6,7 +6,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <RouteModal>
-      <TaskDetails id={id} />
+      <TaskDetails id={id} isMini={true} />
     </RouteModal>
   );
 }

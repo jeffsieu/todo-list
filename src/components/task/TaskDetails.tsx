@@ -1,14 +1,17 @@
 'use client';
 
-import { Stack, Typography } from '@mui/material';
+import { Button, IconButton, Stack, Typography } from '@mui/material';
 import { useTaskDatabase } from '../providers/TaskDatabaseProvider';
 import { Controller, useForm } from 'react-hook-form';
 import DatePickerChip from '../ui/DatePickerChip';
 import TaskStatusPickerChip from '../ui/TaskStatusPickerChip';
 import { Task } from '@/models/Task';
+import { useRouter } from 'next/navigation';
+import { OpenInNew } from '@mui/icons-material';
 
 type TaskDetailsProps = {
   id: string;
+  isMini: boolean;
 };
 
 function useTask(id: string) {
@@ -19,9 +22,10 @@ function useTask(id: string) {
 
 type TaskFormValues = Omit<Task, 'id'>;
 
-export default function TaskDetails({ id }: TaskDetailsProps) {
+export default function TaskDetails({ id, isMini }: TaskDetailsProps) {
+  const router = useRouter();
   const task = useTask(id);
-  const { upsertTask } = useTaskDatabase();
+  const { upsertTask, deleteTask } = useTaskDatabase();
   const { control } = useForm<TaskFormValues>({
     defaultValues: task,
   });
@@ -35,41 +39,68 @@ export default function TaskDetails({ id }: TaskDetailsProps) {
       direction="column"
       sx={{ padding: (theme) => theme.spacing(2), alignItems: 'start' }}
     >
-      <Typography variant="h6">{task.title}</Typography>
+      <div className="flex items-center self-stretch justify-between">
+        <Typography variant="h6">{task.title}</Typography>
+        {isMini && (
+          <IconButton
+            aria-label="Open in new"
+            onClick={() => {
+              // open current url in new tab
+              window.open(window.location.href, '_blank');
+            }}
+          >
+            <OpenInNew />
+          </IconButton>
+        )}
+      </div>
       <Typography
         variant="subtitle1"
         sx={{ color: (theme) => theme.palette.text.secondary }}
       >
         {task.description}
       </Typography>
-      <div className="flex items-center gap-2 mt-2">
-        <TaskStatusPickerChip
-          value={task.status}
-          onChange={(status) => {
-            upsertTask({
-              ...task,
-              status,
-            });
+      <div className="flex justify-between items-center gap-2 mt-2 self-stretch">
+        <div className="flex items-center gap-2">
+          <TaskStatusPickerChip
+            value={task.status}
+            onChange={(status) => {
+              upsertTask({
+                ...task,
+                status,
+              });
+            }}
+          />
+          <Controller
+            control={control}
+            name="dueDate"
+            render={({ field }) => {
+              return (
+                <DatePickerChip
+                  placeholder="Due date"
+                  value={task.dueDate}
+                  onChange={(dueDate) => {
+                    upsertTask({
+                      ...task,
+                      dueDate,
+                    });
+                  }}
+                />
+              );
+            }}
+          />
+        </div>
+        <Button
+          variant="outlined"
+          sx={{
+            color: '#93000A',
           }}
-        />
-        <Controller
-          control={control}
-          name="dueDate"
-          render={({ field }) => {
-            return (
-              <DatePickerChip
-                placeholder="Due date"
-                value={task.dueDate}
-                onChange={(dueDate) => {
-                  upsertTask({
-                    ...task,
-                    dueDate,
-                  });
-                }}
-              />
-            );
+          onClick={async () => {
+            await deleteTask(task);
+            router.back();
           }}
-        />
+        >
+          Delete task
+        </Button>
       </div>
     </Stack>
   );
