@@ -1,0 +1,22 @@
+{
+  "plugins": ["@stylistic"],
+  "rules": {
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "ignoreDestructuring": true
+      }
+    ],
+    "@stylistic/arrow-parens": ["error", "always"],
+    "@stylistic/operator-linebreak": "error",
+    "@stylistic/space-infix-ops": "error",
+    "@stylistic/comma-spacing": "error",
+    "@stylistic/brace-style": ["error", "1tbs"],
+    "@stylistic/object-curly-newline": ["error", { "consistent": true }],
+    "@stylistic/object-curly-spacing": ["error", "always"]
+    // "@stylistic/max-len": ["error",
+    //   { code: 80 },
+    // ], // Limit line length to 80 characters
+  }
+}
